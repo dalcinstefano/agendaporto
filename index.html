@@ -1,0 +1,496 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Agenda Portomansuè</title>
+<meta name="theme-color" content="#17984d">
+<meta name="robots" content="noindex">
+<script>var STATICO = true;</script>
+</head>
+<body>
+
+<style>
+  :root{
+    --verde:#17984d; --verde-scuro:#0d7038; --verde-chiaro:#e8f6ee;
+    --testo:#16241c; --tenue:#6b7c72; --tenue-forte:#3f5349;
+    --bordo:#dde5e0; --fondo:#f5f7f6;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--fondo); color:var(--testo);
+    font:15px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,system-ui,sans-serif;
+    -webkit-text-size-adjust:100%;
+  }
+
+   
+  header{
+    position:sticky; top:0; z-index:20;
+    background:var(--verde); color:#fff;
+    padding:calc(10px + env(safe-area-inset-top)) 12px 0;
+    box-shadow:0 2px 10px rgba(0,0,0,.16);
+  }
+  .marchio{display:flex; align-items:center; gap:9px; font-weight:700; letter-spacing:.2px}
+  .marchio .scudo{height:34px; width:auto; flex:0 0 auto; display:block}
+  .marchio small{display:block; font-weight:500; font-size:11px; opacity:.85; letter-spacing:.3px}
+  .sezioni{display:flex; gap:4px; margin-top:10px}
+  .sezioni button{
+    flex:1; background:none; border:0; color:#fff; opacity:.7;
+    font:600 14px/1 inherit; padding:11px 4px; cursor:pointer;
+    border-bottom:3px solid transparent;
+  }
+  .sezioni button[aria-selected="true"]{opacity:1; border-bottom-color:#fff}
+
+   
+  .barra{padding:10px 12px 6px; display:flex; gap:7px; flex-wrap:wrap; align-items:center}
+  .pill{
+    border:1px solid var(--bordo); background:#fff; color:var(--tenue);
+    border-radius:999px; padding:6px 13px; font:600 13px/1 inherit; cursor:pointer;
+  }
+  .pill[aria-pressed="true"]{background:var(--verde); border-color:var(--verde); color:#fff}
+  .cerca{
+    flex:1 1 100%; min-width:0; border:1px solid var(--bordo); background:#fff;
+    border-radius:10px; padding:9px 12px; font:15px inherit; color:var(--testo);
+  }
+  .cerca:focus{outline:2px solid var(--verde); outline-offset:-1px}
+
+   
+  .periodo{display:flex; gap:6px; align-items:center; padding:2px 12px 0}
+  .periodo .freccia,.periodo .oggi{
+    flex:0 0 auto; border:1px solid var(--bordo); background:#fff; color:var(--testo);
+    border-radius:8px; padding:6px 10px; font:600 14px/1 inherit; cursor:pointer;
+  }
+  .periodo .oggi{font-size:12.5px}
+   
+  .periodo button[disabled]{opacity:.35; cursor:default}
+  .scelta{display:flex; flex:1; border:1px solid var(--bordo); border-radius:8px; overflow:hidden; background:#fff}
+  .scelta button{
+    flex:1; border:0; background:none; color:var(--tenue);
+    font:600 13px/1 inherit; padding:7px 2px; cursor:pointer;
+  }
+  .scelta button[aria-pressed="true"]{background:var(--verde); color:#fff}
+  .etichetta{
+    text-align:center; font:600 11.5px/1 inherit; letter-spacing:.7px;
+    text-transform:uppercase; color:var(--tenue); padding:9px 12px 2px;
+  }
+
+   
+  main{padding:0 12px calc(28px + env(safe-area-inset-bottom))}
+  .mese{
+    font:700 12px/1 inherit; letter-spacing:1.2px; text-transform:uppercase;
+    color:var(--tenue); margin:18px 2px 8px;
+  }
+
+  .ev{
+    display:flex; gap:11px; align-items:flex-start;
+    border-radius:12px; padding:10px 12px; margin-bottom:8px; cursor:pointer;
+    background:#fff; border:1px solid var(--bordo);
+  }
+   
+  .ev.allenamento{border:2px solid var(--verde); background:var(--verde-chiaro); color:var(--testo)}
+  .ev.allenamento .quando{color:var(--verde-scuro)}
+  .ev.allenamento .dove,.ev.allenamento .luogo{color:var(--tenue-forte)}
+  .ev.partita{background:var(--verde); border-color:var(--verde); color:#fff}
+  .ev.partita .quando,.ev.partita .dove,.ev.partita .luogo{color:rgba(255,255,255,.96)}
+   
+  .ev.passato{opacity:.72}
+  .ev.oggi{box-shadow:0 0 0 2px var(--verde-scuro)}
+
+  .quando{flex:0 0 42px; text-align:center; color:var(--tenue); line-height:1.15}
+  .quando b{display:block; font-size:21px; font-weight:800; letter-spacing:-.5px}
+  .quando span{font-size:10px; text-transform:uppercase; letter-spacing:.6px}
+
+  .corpo{flex:1; min-width:0}
+  .titolo{font-weight:700; word-break:break-word}
+  .riga2{display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-top:2px; font-size:13px}
+  .ora{font-weight:600}
+  .dove{color:var(--tenue-forte); font-size:12px; font-weight:600}
+  .luogo{
+    display:block; margin-top:5px; font-size:12.5px; color:var(--tenue-forte);
+    text-decoration:none; word-break:break-word;
+  }
+  .ev.partita .luogo{text-decoration:underline; text-underline-offset:2px}
+  .luogo u{text-decoration:underline; text-underline-offset:2px}
+  .note{
+    margin-top:7px; padding-top:7px; font-size:13px; white-space:pre-wrap;
+    border-top:1px solid rgba(128,128,128,.25);
+  }
+
+  .vuoto{text-align:center; color:var(--tenue); padding:44px 16px; font-size:14px}
+  .errore{
+    background:#fdecea; border:1px solid #f5b8b1; color:#8c1d13;
+    border-radius:10px; padding:12px; margin:14px 0; font-size:13.5px;
+  }
+  .pie{text-align:center; color:var(--tenue); font-size:11.5px; padding:18px 0 4px}
+  .pie button{
+    background:none; border:0; color:var(--verde); font:inherit;
+    text-decoration:underline; cursor:pointer;
+  }
+
+   
+  .comp{background:#fff; border:1px solid var(--bordo); border-radius:12px; margin:12px 0; overflow:hidden}
+  .comp h2{margin:0; padding:12px 13px; font-size:14px; background:var(--verde-chiaro); color:var(--verde-scuro)}
+  .ling{display:flex; gap:4px; overflow-x:auto; padding:8px 8px 0; border-bottom:1px solid var(--bordo)}
+  .ling button{
+    flex:0 0 auto; background:none; border:0; border-bottom:3px solid transparent;
+    color:var(--tenue); font:600 13px/1 inherit; padding:8px 10px; cursor:pointer;
+  }
+  .ling button[aria-selected="true"]{color:var(--verde); border-bottom-color:var(--verde)}
+  .telaio{position:relative; overflow:hidden; padding:8px}
+  .telaio iframe{width:500px; border:0; display:block; transform-origin:top left}
+  .fallback{font-size:12px; color:var(--tenue); padding:0 10px 10px; text-align:center}
+  .fallback a{color:var(--verde)}
+  [hidden]{display:none!important}
+</style>
+
+<header>
+  <div class="marchio">
+    <img class="scudo" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEMAAABQCAYAAABCiMhGAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAABjHSURBVHhe7VoHVFTH119jEmN0F0UTK9aYGGOMLdhiizGJCipKZ9ldqgj2EmNFVNSggrE3pJdll15EuqKiiKACggbBXhAFFFFpv/&#43;5syziAxWiaZ/fPeeet&#43;&#43;9O3dmfnPbzFse7//pOXWWzm/O85zwNW9D52ru/idZ2b42c2X&#43;rdz5a550wte8tl6Gg9TCrTHxyHpMTLB/Q15Xi7nv/sV8xB49jywEj7dryKBJxzfiXSerbDfweHuGDvz5qL3iSXklUF5RP1dWPmcmW4/MP8blz2dF46vgvn8NAzDPdOaCUYGq8vI6jMoKVJSVsY6elpaioKCgjsw/yhUVeHj/Hh4VPni&#43;WEQV9c&#43;Hy0QWDQGDlJc8KoGnjw9cPDxx7PhxrHdwqOmUK/9PMFG4vydmG2vD0W4F/H1ckfdHdg0mXHkuNxwMABcvXkJ4RAR8faVwdnWDm7s7kpOTcef27QZ19lcxKiqBKsXQDwd4wXzKeFjpToL5dA2YaU&#43;Bx&#43;7teJB/VzHGV1gJkWXmwQaAUVWFnJwc7Ni9BxGHIiExM8eatWux78ABrLW3R0pKyj8CiIKqUFr6kP1y&#43;X0Dxg7sB2sjQ5hNmwwbQy2YTR6PRTPNce5McvUY685Pqeu1YFBnxUXF2LF3Hxw2bUJYRATmLliEffsPMPGLWVnY4LAJT0ofM7fhdvJXMdHDhw8QeNABC&#43;ZOwu1z6fCUumGiCh/WbdujX7t2GPHdUCyztoKVgRaMp2niWFxsNSD166sBY8LR9S8Bgzp9iGW2dggMCGD3jrv2YrzmVCz5dSlu3LgBp23b8ay09O8Bg7IEgFs3c&#43;Cw2hIS4RjY6/2MtPZdcEJXHxs1J8Kpd28caNMO5qqfQmPkD9CbMgm6U8fD29tTAUZFXb0vgPEyy1AOIC83F0VFRbiQno7JOvpYsGINzGba4M7NmygqKla0rayq2/YtMkuXFRWIiXXG1tWzIJzQF7t99&#43;APkRAX2nZGdns1ZPbsjSD1b3Fg9GjY9x&#43;E0WqdoS80REa2IphyddboBjCjQWDU&#43;CfwuKQE9g5bYDlvMbT0jRAcHAJUliMtzhvPnjyt1lG3/dtgonsFl2FjNRJ6Pw3Apr2bUJR6BplqXZHR9TNk9PgCF3p8jsuduiKlU3dE9leHh5EEiREBePbsEWvP1Vlb94wLLg0Do3ajqqoqOG7biZ2ecmw76AmRhTUMxnTE&#43;cjfgacFCj2v6PjPMlF0nBTjNDpgz05Hdn917iykNxMgo/vnyOxJYPTCiaGDIev3NS526Iacz/rBRnMAJkz8ArmXs1gy4OpV6rb6M2AQyeS&#43;cA8MhYGJBT7sPxOqP23FyEkGMDURwtVpMUoLrjC52u24uhrDFI8elxTCdqU59A1G4dL1yyi/eR2nen2O00O/w4VuvXC&#43;52dIVOuEWO2p8Bw7DOc/VUPUZC1s2bUJIweqwcNly0vHQdQoMIgup8XAYbEOBmnYwHjWcmx2dMKXQnd8MnI&#43;2o2YhSY/eaPZ0KWYO8sMueePsDZUud68lqvQ/5p8/zImungxDaaicbC2mIzbJY9w1XYF4gaNgDRAjsg&#43;PXGmY3uc69wNGX0HQPrtQMSotke8qycOR3lBqPMdcnNeXCCu/ga7CQteALwdJOj4zc/gfe&#43;Nsaab2bOF26LQdOB8dB&#43;mh/Y/O6DlFBnURltj90odpB9XZKDjUVIU3r6MG1cu49Y1xaBeZrL1MdHJpMMQ6g3D/n3bcPf2baT27YdTXbrDZdsmOC6Zhyi1bshq3Q4XOnZHToduCBwwGHeLSxAcdBCDBjdDRJgzdVnvYjQODABpJ2Ox3rQP1H5cji6jLCEYswY3ruUi&#43;2o&#43;mo/ZiM/UNdFjhDHajHfA9NFq8Nhpi9xzcQhxXo7scycR5O6IIM9teFT0ANeu5uJ&#43;fn69A6uPiVLPHIOF1nDscV2D3H37kdy&#43;Ezy0pyJcFojEkqdwO5wAZ/MZSOr1JTJUOyJk7RrWztV1LcaNUMOqVVaorKyqtwQgarCbEJ07nYjdlu2hrjkDndV10VR9KZZu9mDvdFcEoEV/CTr0GgT&#43;SFts2e2OzLMn4OeyBelnTsDPbQc8nbdj1SIzxEeFwcdlB/Lv3m0UGNdv5GCqTl&#43;IZ0/BYSMR0j/tiIQBAxAyYybSnHbhZMZlxD96imMaExDVtTsu5Fxm7UyNh2P89x3gH6AYK1e3Un/DwaisRHFxMbw3GsFEbyw6DDFGF3VtdP5xJe7m38XFvFtoO34txL/uRO4VhRvsWD8Hv/1iiLJyIDRQCqd1C2Ah1MBCayEqG7nJU7hUBeYs1oKG9lCsXWiN2F59kdq7D04MUcclQRt4TtVEfOwRpHfrgaA581BUWYqwMGdYmWnB4TcHFBU/fCn4RDMvuL4eDGW8yDqfDJ&#43;DW&#43;EkaYehP&#43;qg05fDwes9C2t3&#43;LL3t6o3bVkZaRgr2YSvR07GHlsDFBbcQ2bGeZxOOgoz3XFw37m2cUBQ/9XgbdmzAhPGD4DVXCGs9TSxY&#43;AgZHfpjvTP&#43;yBu5GicnqqN2K49cCo5BSnJsdCc0APjx7yHnbtXVs&#43;vrn7WR0PBqCwvw6PiQiydI0RSYhxOBG&#43;Dlf4ILN0WioRT6UDV8/MDh93eeG/QIvDG7sfnE5dhiSYfWelpKCwsRHxUKNz3OeJs8jEmy&#43;2nPn6BystRdPcBVtvawGL4V9g17Ds4r1iJXSYibBkwGB7qQxHcvRe2m4rgF3oQxga9YG05GXNnWyD2SPQrAzaRdVadk64XwSC6fOkCxPoaSE1JRkV5JU4nBOMXk1FUfSPvSh627pfC4tctqCwrxZEzl9DsZ2eofauNNuqW0J00BCkxnii6dxNJifGQuu1A&#43;bOn9QYxLrODpMJCnJkzD3HLViPUxxsbfhgLm2HDsVJ9MGwG9ofTVD3s1NWD/bB&#43;WLpmAZavsoLVwgmwsZyIKRMHQMdgAB6VPGPz4OrnzvO1YJCPPSkpQXZ2Fs6lnkJC7CEsW2iFncu1MGvaF1AdMRe8UdvAU98MW0cXpmKr7wk0HTAbX6n/gPYjZ2PENx1gbfg9ZF4HcCXn4msHxgZXWYWyJyXYtWk5HDR&#43;guMMC4TYrccBUxP4eXvA3XIGXGbNxrIhQ7D4m4FYM6Y3TK2nQGg4EIb6X2GazmDYOyxB3JEEVFbPg9vHC/0BsHktGNXBK//ODcREhmLD6oVIP5uG3KzTCHdbCyvDsRCMs8eXo/TQbNivCIlMYGrmOoWjbe9x6D5MH/t8onHsaAIqyxR7F67&#43;ermiApXlFcjN&#43;wPe8gPIf1AA55/GY7eeAe5XViDcfg12fv45gnX0sW74cCz99lvExR2B/W8zsWrNPMQkxCEvL0cxp9cAQdwoMBKiw&#43;Dj6QLP/U7I&#43;yMTdisW4ubNfFyI3o7ho0ej61A9DBo9CZ1GWiIp5TyC3DZgUJ8OWGI1VaGXDer1rvFCvxQ4q4AnpQoQc27dQO7NG&#43;x38bNnOJ2Wgq1jR8J5829w&#43;H4UUjxlKH1Wjlu3btV0ydX5MiZqEBhKYSUF&#43;/sgMiIU&#43;XfuwG7pbHhsNMY3ozSgNkyI7upa6P7DfNho9YadUVfM0voMh/xdXhm8XsfK&#43;KIk9rv6qO9W6WOkymXYu24t1lqYoeBBkUKmrKyOnlcxUcPBYKtUhR1O9nBYPR/7tm/E/Xt3ERcdiYeFBQg7uAJGhtPRb6wuRo1Uh9XUPrDW6IhVpoNx77Zipbg63wYTxW1zgq&#43;GFlZoTsJeXX08vJ3faPCJXh9Aa3NFBRJiIlFYUID7d28i9WQ8osLk2Olkj6hgTxyN8IDb7vXITD&#43;H03FSHI&#43;W49aVbIXPNsBv/wyT1RQU5CPM1wuH/Lyxt1cv5MSfaDT4jQdDaaq026m&#43;3rx&#43;FR7O25EUH4b8O4qii0tcHW&#43;blXQoYAfWzZuJMJkrO3N5WYFVHxM1qOh6GdOKV5aVoeSh4hSJUY0FNFzPW&#43;HKSuRdzUVRySOkp6egkvYAjbBGonr2Jq/4vFiHq79bsHbl9bz/O/nFIF/3/Wu49hZ&#43;UuKGF5W9gzQryx28tr5GA7uEWmPKkd8wOWFjA3gDptR59t9mmnvvhMXg9QyZN7Clvwg87&#43;ngeb273DzCFLyP/Iy7tPQTPuEHiMH3M35nWRBpAd7HHlodWkqFj991MPjhpuANlc5vzpcKbwkCJXUF3iEWhJmCxwOa8P2M0gUhJnUE3hmWi0Cewf7x19LX6JAg3Kyu0LvC/iLwZcZlDAy&#43;VLhHcMiirtC7woEStJQaFVSDYTiHomkdoXeEWYiQCjMZGKpSyXhBqCmZSh3B2vyx1IhdW0iN8KGvPlpIhWjma4DmUkP2&#43;0NfA/aO5D7w0WcydG0pFbL3Lf2E7B21&#43;dBH8Y7uqT09U74jObrSe7oq2hrX6KN7pT5lW4Gf6IV&#43;ST/df&#43;RrgI98DevM5QUwws2g4icKZ2B08jfvLJAaP2O&#43;U4&#43;wAgAh2vmbs8l&#43;4m&#43;KL8PmoX2AOboHW6Nr0Ey0kokxIGIxVOUStJZLMOzwMnwbuQTfhC9EW7kJe056OgfOwBehc9A/YhEGRCzCp/5mrD3pI729w&#43;Yyub7h8/F1&#43;AL0Dp3LZJr7GrI2I6JWoF2AeY0&#43;aksyH/vqM7mhh5dh8KEl6Be&#43;kMlQX5&#43;FzGKgCOqZFwODvEJq9BsDA5RRpMKMl2UUWhVCfOEZV9b59KObYXlqD4YeXooV57wx6NBizDi1B31C52Jm8j6sOueD3qFzMOjQL1h21osNkkr4aUcc0NpPiB/j1mL2aWeIT2xn7aYddcDww8thmrQT9hn&#43;&#43;CHWDmOiV8HuvBTfx9iitUzMSmatow4MpA4BFtBJ3IJxsXYYfngZLE7uBs9jKuafcUHfsPkMZBorjWVMjC20j27C2JjVeN9Ht87cGBiHzCHwExpV/4Ocx1PxE7nSQ64gMZn/V2HzseiMK5tEz0BLrDzng5/i1kI7cTOWpXlhxVlvNiCagEduAlsFnrc2bE4fYKuun7gFGzL80TnAAotT3aEqk8DgmBOT10jYgC5BVlibLmOy69JlbA9EOmmyZO40sQnx9uB5ajHrEp/YhuVnvdkYhCd&#43;x/s&#43;eth0IRht5CbgeWkzgNZn&#43;OPLsLn4OW4dxEk7WNnNnRtLq3JRVWuZ6KtaYAglLwODBjM6ehVzC9HxbRgdvZKtHA2ErIPuyQrGx65hJjrw0C9sMmSe2kc3Y3ysHbOocbGrYXVqL3QTt6B/&#43;EKYJe1g8iOjV&#43;L7mNUYcngpc40ewTb4MXYNDI45MjB6hcxGR38zTD&#43;6Cd&#43;EL8CIqOVQC5yBifH2MDzmBL3EzdXjWAWN&#43;PXoFTIL&#43;omObExkWdQ/uZYy5tVmQRBlEuG1QXstP3gOho&#43;4G19mXMGX1y3LaZUpViiCpCIwKYKVHguOymBHAY2siJ6TvDIQsoDnJ6wOZgbM/1VkIvaOghs9UwZP6o/uSQ&#43;9o8BIfSgDpXJxlLpJhu5JrmmtfkmHsm&#43;e5zS8563L&#43;qwztwgWB&#43;U1QCiJ72uUyrIKxyqUrHymjOLUEd3TVSmjfFa7Xe221E55r8wudK3dn1IHPX/&#43;&#43;zkISjl6RpNXAqIcR&#43;3M1dRbB7qJjlCP/BXve9eNGYLDFmjlazybiwVPRSpaRy9rBP1E&#43;MTfjPlhp0BL5osf&#43;ugx/&#43;wVOptlEHpGAZJ&#43;qwVZsQE08dZBp8AZLPtQW4oHzaVGTJZcgAIgrVZbf1P2vvaKq/iJmD7l5MmKaGKUGdrKTfGetw4bF&#43;knGVptijPUhrIRjYOupLdjoCWLTd9FrcDCVDd0CrB4AfjqeFHZRi7uzcWC115mOlgQbAK&#43;TMQ6et9bB0vPeiH8ZipskvdjW3Y4ugSYY2t2OMZFr8TGzECMi7FFz2AbpD3IhfD479iXEw29Y46YlXIQjhdC4HPlGBaneWDwoV&#43;w6rwvtI5uwsIzbjBL2ok2fsY4fi8bv6Z5gucygaXj7OKb&#43;CHGDk3cNVlwpmDLc5/CJpV49wK2ZoeB5z6ZBXKKNQvOuLI4YpcuY3En7UEehkQuZXGG4hNloGP52SzD2J6XKizER08BRogp&#43;L7C81wcGNna2r4nkBqn86tdhec5FXNSnHHi3kWMil6F4rLHCLqejODryeDtHwOj47/j&#43;uP7aOdvhvtPH&#43;HL0LmIv5OB/Tkx&#43;MB9CssecXcy8L77ZNid90POozvguWsyucflT/FV2DysPu&#43;H3Ed30MJXnwVW0kO1Cck5ZAbh&#43;uMCZh1kbYtT3ei8naVgSqGUJe49LcaPsXYswNKzorISVvuoysQYG2PLgvLtJ4Ws/qDfZK1KNyUvUJEK7bg41JCK1Gix0lUojc1M3o&#43;MouswP7kL42NW43RBDkthPJefGMrPKssx8NBipBdeRdStszh6NxMfeOuC5zYJmzIDEXsnHbz9Y3EgJwaJ&#43;VnguWmyVS4pf8LSHZn4kbuZTCdlBLIMAqlbsDXLFASGwfGtaOI1Hd9H27IMUllVCft0OXMvstynFWXY&#43;0cUyyJ3nhRWgyFh9QqBkFdyl1k1LSilf3IzchGBv7iqna9pXy4GNfSxv1GHlnLjUral9ZiKX9I8kFeSD57HFAbA5gshiL1zHjzn8bBO3o/U&#43;7n4RG6KwmclME/axVZKnLQdvIM/YufFCJy5f5m10z/miNxHd9HUS5ut0K3SB6xKpMFKknYgs&#43;ga8/XislK2wlSIUfre90c0sopvoJmPHoyPb2MWQ25FExx2eDn6hM5jk7/08BZzRRoHLQ6lXrIMcqWHZaVMNxVgxJTtWAkuFZ3gzr8O8aVGPvxIc3zko88qzV2XIlkAZYFOKmR&#43;qhm/ngH1RcgsVm26Xo7DkMhfmalvvxiBtlIjLDrjBqesUOZG73tpM/OmeEKFGNUEFFjJr2kyw6OWo0/YXDjnxGJS/HqYndyFZj76TM4r7yiLJ1R4UcHV1FubxROqKpekeWJcjB2rQT70mg6LU3uw6pwvtI44oJ2/KauFSCcBszTNiwVTihlUgreSGhtz516HVGXCIfxgCQRyMasfeJ7TmWlRvUH&#43;RlmBsgy9UwYjcillJqH3ApkYTcld2G9FQKYKkLKCUo7aKWuM53qmsXvl5ovSJulW1jAkQ3UH6VbWKIoso0ib1Ae9V6R/RVonnfSOLILpDTYhmeudpdrNuXOvl/i&#43;RrFUkNSkIQ6/kKIawcr8r/xNE1Lqql2D0FVZM3B1cJk7FgKeK1ObBVGWaCUVLePO&#43;aXUUW7yA50LUprlKnsTJguglaNVp5UiF6HVovqhY4AlWsskbNWpXqANGl25Ot6IgyR0VHG/a6C4FXfOryR2HPiS/UpjmZmtrwHMT&#43;6G7GoS3veazvyd/PuXVA&#43;2A6WNGjHtcSjzJBf8wbIABV2uvj/LZBWqjbEKJan4ifvzAyVVrFKrR3FjmEy3iZcORCe2I73wGnOB26WFbDt/quASK9pou&#43;9yOQ4Hc2LRO3AG5qa4YH6KS43PvykrthrCvK7x4o&#43;4c20QqfgI9xCafGld5Y1lCqYaCRtx&#43;n4OmnpOY1nKPkOOC8XXsTjVA1uzwnDy3kUsSvNgtcmGjAC2i1WW62/EdIoXYYaWvgZTuXNsMKm4iFvxZaI7fCrTuR00kikraSduYRUnyzTumth9KRIHL8exuoTS4NkHeeggN0G/iIWskHrvbbiIVHGapSIVKo723oRUpSJtFjveIJgqsoghK&#43;GpkOoWNJOdS1AM&#43;dhHH72CrWFzej87wqMCj9yH6g3adXJ1NZopaAaIi3v4WXbhzu1PUUsfo4Nv6i5Ub1D6pFpApTpTkOtQ/KBzU8ourCCSKeoLqmNY6VyPrgazTKQ41vMV6nPn9KepQ4jlx3yZcRb72PQGgPytLDWGSrQlucce7nzemFp5i/oJgkyeMLPjdvxvYxYnzCGQGSfp&#43;Nl&#43;yJ3LWyEVL&#43;F0Voz9m7/aU1EXbgZBgPhaC2/9dtw5vFVq4W04hwXUt1B/vHUmF6Z6IlCU39pd9&#43;Xb87dJn/qZbGQB9d8ESDUQrUJMS7vIzUZwx/yXkqpM8psKAfKKL3F/GxMQYaZQCTYp6Cq3GMsd699CKjLRIj5lGPqzyz&#43;YZZjbBomvfeA6/fnHoH&#43;C6AMUP0hcxmr/vxsQGW2&#43;LMAPECWrehh15o7tH6HWXgbf8YPEV2p/avhLmUAPlLBDXYG/2LXzlgYe1Pxd9ImfuL0gQBzMAPmL3YYOngRBksdt/CXW3HH8q0ggF83iB0mK2af&#43;N9jP1GECN0hhDa2CJImdZKJ&#43;3L7/ldRWLuklCBAHsPKdijTuxBrL/mKFSwRJClr5i&#43;t&#43;DvwvUKsAYw1BoCSVbZY433EbxARCpAVaBoifqQSKd6lKRZ24ffynCOA1aeEnNGoZIE5VIVDIWl5XrFUHx5Zy46eqgRLPllKjPly9/3Vqoupvos0PEEXRn3BZoFUc0CoACBBDEGGmqBn8RXcEAWJHvtToC66S/3PUNtB8kMBfvEXgL86lEpq5gtz4UQu5cZhKoFii4mXYmtvmr6b/ASgayGjzn3uAAAAAAElFTkSuQmCC" alt="ACD Portomansuè">
+    <div>ACD Portomansuè<small>agenda squadra</small></div>
+  </div>
+  <div class="sezioni" role="tablist">
+    <button role="tab" aria-selected="true" onclick="sezione('agenda')">Agenda</button>
+    <button role="tab" aria-selected="false" onclick="sezione('campionato')">Campionato</button>
+  </div>
+</header>
+
+<div id="vistaAgenda">
+  <div class="barra">
+    <button class="pill" aria-pressed="true" onclick="filtro('')">Tutto</button>
+    <button class="pill" aria-pressed="false" onclick="filtro('allenamento')">Allenamenti</button>
+    <button class="pill" aria-pressed="false" onclick="filtro('partita')">Partite</button>
+    <input class="cerca" id="cerca" type="search" placeholder="Cerca avversario, campo…"
+           oninput="disegna()" autocomplete="off">
+  </div>
+
+  <div class="periodo">
+    <button class="freccia" id="prec" onclick="sposta(-1)" aria-label="periodo precedente">‹</button>
+    <div class="scelta">
+      <button aria-pressed="false" onclick="periodo('sett')">Sett.</button>
+      <button aria-pressed="false" onclick="periodo('mese')">Mese</button>
+      <button aria-pressed="true"  onclick="periodo('tutti')">Tutti</button>
+    </div>
+    <button class="freccia" id="succ" onclick="sposta(1)" aria-label="periodo successivo">›</button>
+    <button class="oggi" id="oggi" onclick="vaiAOggi()">Oggi</button>
+  </div>
+  <div class="etichetta" id="etichetta"></div>
+
+  <main id="lista"><div class="vuoto">Caricamento…</div></main>
+</div>
+
+<div id="vistaCampionato" hidden>
+  <main id="competizioni"><div class="vuoto">Caricamento…</div></main>
+</div>
+
+<script>
+  var MESI = ['gennaio','febbraio','marzo','aprile','maggio','giugno','luglio',
+              'agosto','settembre','ottobre','novembre','dicembre'];
+  var GIORNI = ['dom','lun','mar','mer','gio','ven','sab'];
+
+  var MESIBREVI = ['GEN','FEB','MAR','APR','MAG','GIU','LUG','AGO','SET','OTT','NOV','DIC'];
+
+  var EVENTI = [], TIPO = '', OGGI = iso(new Date()), COMPET = [], PRIMOGIRO = true;
+  var VISTA = 'tutti', RIF = new Date();
+
+  function iso(d){
+    return d.getFullYear() + '-' + ('0'+(d.getMonth()+1)).slice(-2) + '-' + ('0'+d.getDate()).slice(-2);
+  }
+  function esc(s){
+    return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  
+  
+
+  function statica(){ return typeof STATICO !== 'undefined' && STATICO; }
+
+  function carica(forza){
+    if(statica()){
+      fetch('agenda.json?t=' + Date.now(), {cache:'no-store'})
+        .then(function(r){
+          if(!r.ok) throw new Error('agenda.json: ' + r.status);
+          return r.json();
+        })
+        .then(function(r){
+          EVENTI = r.eventi || [];
+          COMPET = r.competizioni || [];
+          window.AGGIORNATO = r.aggiornato;
+          disegna();
+        })
+        .catch(function(e){ erroreLista(e.message || String(e)); });
+      return;
+    }
+
+    google.script.run
+      .withSuccessHandler(function(r){
+        try{
+          if(!r || !r.ok){ erroreLista((r && r.errore) || 'Il calendario non risponde.'); return; }
+          EVENTI = r.eventi || [];
+          window.AGGIORNATO = r.aggiornato;
+          disegna();
+        }catch(e){ erroreLista('Errore nel disegno: ' + e.message); }
+      })
+      .withFailureHandler(function(e){ erroreLista(e.message || String(e)); })
+      .apCaricaAgenda(!!forza);
+  }
+
+  function erroreLista(msg){
+    document.getElementById('lista').innerHTML =
+      '<div class="errore"><b>Non riesco a leggere il calendario.</b><br>' + esc(msg) + '</div>';
+  }
+
+  
+  function filtro(t){
+    TIPO = t;
+    var b = document.querySelectorAll('.barra .pill');
+    for(var i=0;i<b.length;i++) b[i].setAttribute('aria-pressed', String(i === ['','allenamento','partita'].indexOf(t)));
+    disegna();
+  }
+
+  
+  function periodo(v){
+    VISTA = v;
+    if(v !== 'tutti') RIF = new Date();   
+    aggiornaBarra();
+    disegna();
+  }
+
+  function sposta(passi){
+    if(VISTA === 'sett')  RIF = new Date(RIF.getTime() + passi * 7 * 86400000);
+    if(VISTA === 'mese')  RIF = new Date(RIF.getFullYear(), RIF.getMonth() + passi, 1);
+    aggiornaBarra();
+    disegna();
+  }
+
+  function vaiAOggi(){
+    RIF = new Date();
+    aggiornaBarra();
+    disegna();
+    if(VISTA === 'tutti') vaiAlProssimo();
+  }
+
+  function aggiornaBarra(){
+    var b = document.querySelectorAll('.scelta button');
+    var ordine = ['sett','mese','tutti'];
+    for(var i=0;i<b.length;i++) b[i].setAttribute('aria-pressed', String(ordine[i] === VISTA));
+
+    var tutti = VISTA === 'tutti';
+    ['prec','succ','oggi'].forEach(function(id){ document.getElementById(id).disabled = tutti; });
+    document.getElementById('etichetta').textContent = etichetta();
+  }
+
+   
+  function lunedi(d){
+    var g = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+    g.setDate(g.getDate() - ((g.getDay() + 6) % 7));
+    return g;
+  }
+
+  function settimanaISO(d){
+    var t = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+    t.setDate(t.getDate() + 3 - ((t.getDay() + 6) % 7));
+    var primo = new Date(t.getFullYear(), 0, 4);
+    return 1 + Math.round(((t - primo) / 86400000 - 3 + ((primo.getDay() + 6) % 7)) / 7);
+  }
+
+   
+  function finestra(){
+    if(VISTA === 'sett'){
+      var l = lunedi(RIF);
+      return { da: iso(l), a: iso(new Date(l.getTime() + 6 * 86400000)) };
+    }
+    if(VISTA === 'mese'){
+      return {
+        da: iso(new Date(RIF.getFullYear(), RIF.getMonth(), 1)),
+        a:  iso(new Date(RIF.getFullYear(), RIF.getMonth() + 1, 0))
+      };
+    }
+    return null;
+  }
+
+  function etichetta(){
+    if(VISTA === 'sett'){
+      var l = lunedi(RIF), d = new Date(l.getTime() + 6 * 86400000);
+      return 'Sett. ' + settimanaISO(l) + ' · ' +
+             l.getDate() + ' ' + MESIBREVI[l.getMonth()] + ' – ' +
+             d.getDate() + ' ' + MESIBREVI[d.getMonth()] + ' ' + d.getFullYear();
+    }
+    if(VISTA === 'mese') return MESI[RIF.getMonth()].toUpperCase() + ' ' + RIF.getFullYear();
+    return 'tutta la stagione';
+  }
+
+  function sezione(quale){
+    var agenda = quale === 'agenda';
+    document.getElementById('vistaAgenda').hidden = !agenda;
+    document.getElementById('vistaCampionato').hidden = agenda;
+    var b = document.querySelectorAll('.sezioni button');
+    b[0].setAttribute('aria-selected', String(agenda));
+    b[1].setAttribute('aria-selected', String(!agenda));
+    if(!agenda) disegnaCompetizioni();
+  }
+
+  
+  function disegna(){
+    var q = (document.getElementById('cerca').value || '').trim().toLowerCase();
+    var f = finestra();
+
+    var righe = EVENTI.filter(function(e){
+      if(TIPO && e.tipo !== TIPO) return false;
+      if(f && (e.dataISO < f.da || e.dataISO > f.a)) return false;
+      if(!q) return true;
+      return (e.titolo + ' ' + e.avversario + ' ' + e.luogo + ' ' + e.note).toLowerCase().indexOf(q) !== -1;
+    });
+
+    var lista = document.getElementById('lista');
+    if(!righe.length){
+      lista.innerHTML = '<div class="vuoto">' +
+        (f ? 'Niente in questo periodo.<br>Usa le frecce o passa a <b>Tutti</b>.'
+           : 'Nessun impegno con questi filtri.') +
+        '</div>' + piede();
+      return;
+    }
+
+    var html = '', mese = '', ancora = '';
+    righe.forEach(function(e){
+      var d = e.dataISO.split('-');
+      var etichetta = MESI[Number(d[1])-1] + ' ' + d[0];
+      if(etichetta !== mese){ mese = etichetta; html += '<div class="mese">' + mese + '</div>'; }
+
+      var g = new Date(Number(d[0]), Number(d[1])-1, Number(d[2]));
+      var passato = e.dataISO < OGGI;
+      if(!passato && !ancora){ ancora = ' id="prossimo"'; }
+
+      var classi = 'ev ' + (e.tipo === 'allenamento' ? 'allenamento' : 'partita') +
+                   (passato ? ' passato' : '') + (e.dataISO === OGGI ? ' oggi' : '');
+
+      var quando = e.tuttoGiorno ? 'tutto il giorno'
+                 : (e.ora + (e.oraFine ? '–' + e.oraFine : ''));
+
+      var dove = e.dove === 'casa' ? 'in casa' : (e.dove === 'trasferta' ? 'in trasferta' : '');
+
+      html += '<article class="' + classi + '"' + ancora + ' onclick="apri(this)">' +
+                '<div class="quando"><b>' + Number(d[2]) + '</b><span>' + GIORNI[g.getDay()] + '</span></div>' +
+                '<div class="corpo">' +
+                  '<div class="titolo">' + esc(e.titolo) + '</div>' +
+                  '<div class="riga2"><span class="ora">' + esc(quando) + '</span>' +
+                    (dove ? '<span class="dove">' + dove + '</span>' : '') + '</div>' +
+                  luogoHtml(e) +
+                  (e.note ? '<div class="note" hidden>' + esc(e.note) + '</div>' : '') +
+                '</div>' +
+              '</article>';
+      ancora = '';
+    });
+
+    lista.innerHTML = html + piede();
+    if(PRIMOGIRO && VISTA === 'tutti'){ PRIMOGIRO = false; vaiAlProssimo(); }
+  }
+
+  function luogoHtml(e){
+    if(!e.luogo) return '';
+    var url = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(e.luogo);
+    return '<a class="luogo" href="' + esc(url) + '" target="_blank" rel="noopener" ' +
+           'onclick="event.stopPropagation()">📍 <u>' + esc(e.luogo) + '</u></a>';
+  }
+
+  function piede(){
+    return '<div class="pie">aggiornato il ' + esc(window.AGGIORNATO || '—') +
+           ' · <button onclick="carica(true)">ricarica</button></div>';
+  }
+
+  function apri(card){
+    var n = card.querySelector('.note');
+    if(n) n.hidden = !n.hidden;
+  }
+
+  function vaiAlProssimo(){
+    var el = document.getElementById('prossimo');
+    if(el) el.scrollIntoView({block:'center'});
+  }
+
+  
+  var COMPET_DISEGNATE = false;
+
+  function disegnaCompetizioni(){
+    if(COMPET_DISEGNATE) return;
+    
+    if(statica() || COMPET.length){ rendiCompetizioni(); return; }
+    google.script.run
+      .withSuccessHandler(function(c){ COMPET = c || []; rendiCompetizioni(); })
+      .withFailureHandler(function(e){
+        document.getElementById('competizioni').innerHTML =
+          '<div class="errore">' + esc(e.message || e) + '</div>';
+      })
+      .apLeggiWidget();
+  }
+
+  function rendiCompetizioni(){
+    var box = document.getElementById('competizioni');
+    if(!COMPET.length){
+      box.innerHTML = '<div class="vuoto">Nessun widget TuttoCampo impostato.</div>';
+      return;
+    }
+    box.innerHTML = COMPET.map(compHtml).join('');
+    COMPET.forEach(function(c, i){ mostraSezione(i, 0); });
+    COMPET_DISEGNATE = true;
+  }
+
+  function compHtml(c, i){
+    var attive = (c.sezioni || []).filter(function(s){ return s.attiva !== false; });
+    return '<section class="comp">' +
+             '<h2>' + esc(c.competizione) + '</h2>' +
+             '<div class="ling" role="tablist">' +
+               attive.map(function(s, j){
+                 return '<button role="tab" aria-selected="' + (j===0) + '" ' +
+                        'onclick="mostraSezione(' + i + ',' + j + ')">' + esc(s.label) + '</button>';
+               }).join('') +
+             '</div>' +
+             '<div class="telaio" id="telaio' + i + '"></div>' +
+             '<div class="fallback">Se il riquadro resta vuoto, ' +
+               '<a id="diretto' + i + '" href="#" target="_blank" rel="noopener">aprilo su TuttoCampo</a>.</div>' +
+           '</section>';
+  }
+
+  function mostraSezione(i, j){
+    var c = COMPET[i];
+    var attive = (c.sezioni || []).filter(function(s){ return s.attiva !== false; });
+    var s = attive[j];
+    if(!s) return;
+
+    var comp = document.getElementById('telaio' + i).closest('.comp');
+    var bottoni = comp.querySelectorAll('.ling button');
+    for(var k=0;k<bottoni.length;k++) bottoni[k].setAttribute('aria-selected', String(k===j));
+
+    var url = 'https://www.tuttocampo.it/WidgetV2/' + s.tipo + '/' + c.guid;
+    document.getElementById('diretto' + i).href = url;
+
+    var telaio = document.getElementById('telaio' + i);
+    telaio.innerHTML = '<iframe src="' + esc(url) + '" height="' + s.altezza +
+                       '" scrolling="no" loading="lazy"></iframe>';
+    scala(telaio, s.altezza);
+  }
+
+  
+
+  function scala(telaio, altezza){
+    var disponibile = telaio.clientWidth - 16;
+    var s = Math.min(1, disponibile / 500);
+    var f = telaio.querySelector('iframe');
+    if(!f) return;
+    f.style.transform = 'scale(' + s + ')';
+    telaio.style.height = Math.round(altezza * s + 16) + 'px';
+  }
+
+  window.addEventListener('resize', function(){
+    document.querySelectorAll('.telaio').forEach(function(t){
+      var f = t.querySelector('iframe');
+      if(f) scala(t, Number(f.getAttribute('height')) || 400);
+    });
+  });
+
+  aggiornaBarra();
+  carica(false);
+</script>
+
+</body>
+</html>
