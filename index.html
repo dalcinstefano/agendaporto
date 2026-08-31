@@ -126,6 +126,15 @@
     background:none; border:0; color:var(--verde); font:inherit;
     text-decoration:underline; cursor:pointer;
   }
+   
+  .pref{margin-top:9px; display:flex; gap:6px; justify-content:center; align-items:center; flex-wrap:wrap}
+  .pref button{
+    border:1px solid var(--bordo); background:#fff; color:var(--tenue-forte);
+    border-radius:999px; padding:6px 12px; font:600 11.5px/1 inherit;
+    text-decoration:none; cursor:pointer;
+  }
+  .pref button.fatto{border-color:var(--verde); background:var(--verde); color:#fff}
+  .pref button.scorda{border:0; background:none; color:var(--tenue); text-decoration:underline}
 
    
   .comp{background:#fff; border:1px solid var(--bordo); border-radius:12px; margin:12px 0; overflow:hidden}
@@ -190,7 +199,16 @@
   var MESIBREVI = ['GEN','FEB','MAR','APR','MAG','GIU','LUG','AGO','SET','OTT','NOV','DIC'];
 
   var EVENTI = [], TIPO = '', OGGI = iso(new Date()), COMPET = [], PRIMOGIRO = true;
-  var VISTA = 'tutti', RIF = new Date();
+  
+
+  var VISTA = 'sett', RIF = new Date();
+
+  
+
+  var CHIAVE_PREF = 'apPreferenze';
+  function leggiPref(){
+    try{ return JSON.parse(localStorage.getItem(CHIAVE_PREF) || 'null'); }catch(e){ return null; }
+  }
 
   function iso(d){
     return d.getFullYear() + '-' + ('0'+(d.getMonth()+1)).slice(-2) + '-' + ('0'+d.getDate()).slice(-2);
@@ -243,9 +261,14 @@
   
   function filtro(t){
     TIPO = t;
-    var b = document.querySelectorAll('.barra .pill');
-    for(var i=0;i<b.length;i++) b[i].setAttribute('aria-pressed', String(i === ['','allenamento','partita'].indexOf(t)));
+    aggiornaPill();
     disegna();
+  }
+
+  function aggiornaPill(){
+    var b = document.querySelectorAll('.barra .pill');
+    var ordine = ['','allenamento','partita'];
+    for(var i=0;i<b.length;i++) b[i].setAttribute('aria-pressed', String(ordine[i] === TIPO));
   }
 
   
@@ -395,7 +418,38 @@
 
   function piede(){
     return '<div class="pie">aggiornato il ' + esc(window.AGGIORNATO || '—') +
-           ' · <button onclick="carica(true)">ricarica</button></div>';
+           ' · <button onclick="carica(true)">ricarica</button>' +
+           '<div class="pref">' +
+             '<button id="btnPref" onclick="salvaPref()">Apri sempre così</button>' +
+             (leggiPref() ? '<button class="scorda" onclick="scordaPref()">azzera</button>' : '') +
+           '</div></div>';
+  }
+
+  function nomeVista(){
+    return VISTA === 'sett' ? 'settimana' : (VISTA === 'mese' ? 'mese' : 'tutta la stagione');
+  }
+  function nomeTipo(){
+    return TIPO === 'allenamento' ? 'solo allenamenti'
+         : (TIPO === 'partita' ? 'solo partite' : 'tutto');
+  }
+
+  function salvaPref(){
+    var b = document.getElementById('btnPref');
+    try{
+      localStorage.setItem(CHIAVE_PREF, JSON.stringify({tipo:TIPO, vista:VISTA}));
+    }catch(e){
+       
+      b.textContent = 'non riesco a salvare qui';
+      return;
+    }
+    b.textContent = '✓ salvato: ' + nomeTipo() + ' · ' + nomeVista();
+    b.className = 'fatto';
+    setTimeout(disegna, 1800);
+  }
+
+  function scordaPref(){
+    try{ localStorage.removeItem(CHIAVE_PREF); }catch(e){}
+    disegna();
   }
 
   function apri(card){
@@ -488,6 +542,14 @@
     });
   });
 
+  (function applicaPref(){
+    var p = leggiPref();
+    if(!p) return;
+    if(['','allenamento','partita'].indexOf(p.tipo) !== -1) TIPO = p.tipo;
+    if(['sett','mese','tutti'].indexOf(p.vista) !== -1) VISTA = p.vista;
+  })();
+
+  aggiornaPill();
   aggiornaBarra();
   carica(false);
 </script>
