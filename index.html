@@ -277,6 +277,9 @@
     if(v !== 'tutti') RIF = new Date();   
     aggiornaBarra();
     disegna();
+    
+    
+    if(VISTA === 'tutti' || VISTA === 'mese') vaiAlProssimo();
   }
 
   function sposta(passi){
@@ -290,7 +293,7 @@
     RIF = new Date();
     aggiornaBarra();
     disegna();
-    if(VISTA === 'tutti') vaiAlProssimo();
+    if(VISTA === 'tutti' || VISTA === 'mese') vaiAlProssimo();
   }
 
   function aggiornaBarra(){
@@ -406,7 +409,9 @@
     });
 
     lista.innerHTML = html + piede();
-    if(PRIMOGIRO && VISTA === 'tutti'){ PRIMOGIRO = false; vaiAlProssimo(); }
+    
+
+    if(PRIMOGIRO && (VISTA === 'tutti' || VISTA === 'mese')){ PRIMOGIRO = false; vaiAlProssimo(); }
   }
 
   function luogoHtml(e){
