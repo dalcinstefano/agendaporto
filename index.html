@@ -6,7 +6,7 @@
 <title>Agenda U14 Giovanissimi</title>
 <meta name="theme-color" content="#17984d">
 <meta name="robots" content="noindex">
-<script>var STATICO = true;</script>
+<script>var STATICO = true, VERSIONE_PAGINA = "11/09/2026 22:20";</script>
 </head>
 <body>
 
@@ -242,6 +242,7 @@
           return r.json();
         })
         .then(function(r){
+          if(paginaVecchia(r)) return;
           EVENTI = r.eventi || [];
           COMPET = r.competizioni || [];
           window.AGGIORNATO = r.aggiornato;
@@ -262,6 +263,16 @@
       })
       .withFailureHandler(function(e){ erroreLista(e.message || String(e)); })
       .apCaricaAgenda(!!forza);
+  }
+
+  
+
+  function paginaVecchia(r){
+    if(typeof VERSIONE_PAGINA === 'undefined' || !r.versionePagina || r.versionePagina === VERSIONE_PAGINA) return false;
+    var v = encodeURIComponent(r.versionePagina);
+    if(location.search.indexOf('v=' + v) !== -1) return false;
+    location.replace(location.pathname + '?v=' + v);
+    return true;
   }
 
   function erroreLista(msg){
