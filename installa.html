@@ -144,7 +144,8 @@ details{margin-top:8px}summary{cursor:pointer;color:#17984d;font-weight:600}</st
   }
 
   var barra = null;
-  function nascondiBarra() { if (barra) { barra.remove(); barra = null; } }
+  
+  function nascondiBarra() { if (barra) { barra.remove(); barra = null; document.body.style.paddingBottom = ''; } }
   function testoBarra() { if (barra) barra.querySelector('.api-si').textContent = (android && evento) ? 'Installa' : 'Come si fa'; }
   function mostraBarra() {
     if (!BARRA || !telefono || installata || barra) return;
@@ -157,6 +158,7 @@ details{margin-top:8px}summary{cursor:pointer;color:#17984d;font-weight:600}</st
     barra.querySelector('.api-si').onclick = function () { if (android && evento) installaOra(); else apri(); };
     barra.querySelector('.api-x').onclick = function () { scrivi('ap-installa-no', String(Date.now())); nascondiBarra(); };
     document.body.appendChild(barra);
+    document.body.style.paddingBottom = (barra.offsetHeight + 16) + 'px';
     testoBarra();
   }
 
