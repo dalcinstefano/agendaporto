@@ -6,7 +6,9 @@
 <title>Agenda U14 Giovanissimi</title>
 <meta name="theme-color" content="#17984d">
 <meta name="robots" content="noindex">
-<script>var STATICO = true, VERSIONE_PAGINA = "16/10/2026 14:43";</script>
+<link rel="manifest" href="manifest.json"><link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Portomansuè">
+<script>var STATICO = true, VERSIONE_PAGINA = "16/10/2026 15:43";</script>
 </head>
 <body>
 
@@ -594,6 +596,153 @@
   aggiornaPill();
   aggiornaBarra();
   carica(false);
+</script>
+
+
+<style>
+.api-barra{position:fixed;left:8px;right:8px;bottom:8px;z-index:9990;background:#17984d;color:#fff;border-radius:12px;
+  box-shadow:0 4px 18px rgba(0,0,0,.25);display:flex;align-items:center;gap:10px;padding:10px 10px 10px 12px;
+  font-family:system-ui,sans-serif;font-size:.9rem;line-height:1.3}
+.api-barra img{width:36px;height:36px;border-radius:8px;background:#fff;flex:none}
+.api-barra .api-t{flex:1;min-width:0}.api-barra b{display:block;font-size:.95rem}
+.api-barra button{flex:none;border:0;border-radius:8px;font-weight:700;font-size:.9rem;padding:9px 12px;cursor:pointer}
+.api-barra .api-si{background:#fff;color:#17984d}.api-barra .api-x{background:transparent;color:#fff;font-size:1.2rem;padding:6px 8px}
+.api-velo{position:fixed;inset:0;z-index:9995;background:rgba(15,23,42,.55);display:flex;align-items:flex-end;justify-content:center}
+.api-fin{background:#fff;color:#1f2933;width:100%;max-width:480px;max-height:88vh;overflow:auto;border-radius:16px 16px 0 0;
+  padding:18px 18px 22px;box-sizing:border-box;font-family:system-ui,sans-serif;font-size:.95rem;line-height:1.45;text-align:left}
+@media (min-width:700px){.api-velo{align-items:center}.api-fin{border-radius:16px}}
+.api-fin h2{font-size:1.1rem;color:#17984d;margin:0 0 10px;display:flex;align-items:center;gap:8px}
+.api-fin h2 img{width:32px;height:32px;border-radius:7px}
+.api-fin ol{padding-left:22px;margin:8px 0}.api-fin li{margin:8px 0}
+.api-fin .api-ico{display:inline-flex;vertical-align:middle;background:#eef2f6;border-radius:6px;padding:2px 5px;margin:0 2px}
+.api-fin .api-ico svg{width:18px;height:18px}
+.api-fin .api-btn{display:block;width:100%;box-sizing:border-box;margin-top:10px;padding:11px;border-radius:9px;border:0;
+  font-size:1rem;font-weight:700;cursor:pointer;text-align:center;text-decoration:none}
+.api-fin .api-prim{background:#17984d;color:#fff}.api-fin .api-sec{background:#eef2f6;color:#1f2933}
+.api-fin .api-link{word-break:break-all;font-size:.85rem;color:#52606d}
+.api-fin h3{font-size:.95rem;margin:16px 0 4px}
+</style>
+<script>
+(function () {
+  var BARRA = !window.AP_INSTALLA_GUIDA;   
+  var ua = navigator.userAgent || '';
+  var has = function (s) { return ua.indexOf(s) !== -1; };
+  var ios = has('iPhone') || has('iPad') || has('iPod') || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  var android = has('Android');
+  var telefono = ios || android;
+  var social = has('FBAN') || has('FBAV') || has('FB_IAB') || has('Instagram') || has('Line/') || has('MicroMessenger') || has('TikTok');
+  var webview = android && has('; wv)');
+  var iosAltro = ios && (has('CriOS') || has('EdgiOS') || has('FxiOS'));
+  var installata = window.navigator.standalone === true ||
+    (window.matchMedia && (matchMedia('(display-mode: standalone)').matches || matchMedia('(display-mode: fullscreen)').matches));
+  var evento = null;
+  var BASE = location.href.replace(/[#?].*$/, '').replace(/[^/]*$/, '');   
+  var GUIDA = BASE + 'installa.html';
+  var ICONA = '<img src="icon-192.png" alt="">';
+  var SVG_CONDIVIDI = '<svg viewBox="0 0 24 24" fill="none" stroke="#1a73e8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 8l5-5 5 5"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg>';
+  var SVG_PIU = '<svg viewBox="0 0 24 24" fill="none" stroke="#1f2933" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M12 8v8M8 12h8"/></svg>';
+  var SVG_MENU = '<svg viewBox="0 0 24 24" fill="#1f2933"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg>';
+  var ico = function (s) { return '<span class="api-ico">' + s + '</span>'; };
+  function leggi(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+  function scrivi(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+  function intent() { return 'intent://' + BASE.replace(/^https?:\/\//, '') + '#Intent;scheme=https;package=com.android.chrome;end'; }
+
+  function copia(testo, btn) {
+    var fatto = function () { if (btn) { var t = btn.textContent; btn.textContent = '✓ Copiato'; setTimeout(function () { btn.textContent = t; }, 1800); } };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(testo).then(fatto, function () { prompt('Copia questo indirizzo:', testo); });
+    else prompt('Copia questo indirizzo:', testo);
+  }
+
+  function guida() {
+    if (installata) return '<p>✅ Stai già usando l’agenda installata: per riaprirla tocca la sua icona sulla schermata Home.</p>';
+    var h = '';
+    if (social) {
+      return '<p>Sei dentro ' + (has('Instagram') ? 'Instagram' : 'un’altra app (WhatsApp, Facebook…)') + ': da qui l’icona non si può aggiungere. Apri la pagina nel browser:</p><ol>' +
+        (ios ? '<li>tocca <b>···</b> (in alto o in basso a destra) e scegli <b>Apri nel browser</b> / <b>Apri in Safari</b>;</li>'
+             : '<li>tocca ' + ico(SVG_MENU) + ' in alto a destra e scegli <b>Apri in Chrome</b> / <b>Apri nel browser</b>;</li>') +
+        '<li>poi segui i passaggi che compariranno.</li></ol>' +
+        (android ? '<a class="api-btn api-prim" href="' + intent() + '">Apri in Chrome</a>' : '') +
+        '<button type="button" class="api-btn api-sec" data-api-copia="' + BASE + '">Copia l’indirizzo</button><p class="api-link">' + BASE + '</p>';
+    }
+    if (ios) {
+      return '<ol>' +
+        (iosAltro ? '<li>tocca ' + ico(SVG_CONDIVIDI) + ' <b>Condividi</b> (in alto a destra, accanto all’indirizzo);</li>'
+                  : '<li>tocca ' + ico(SVG_CONDIVIDI) + ' <b>Condividi</b> nella barra in basso (se non la vedi, tocca prima una volta in fondo allo schermo);</li>') +
+        '<li>scorri e scegli ' + ico(SVG_PIU) + ' <b>Aggiungi alla schermata Home</b>;</li>' +
+        '<li>premi <b>Aggiungi</b> in alto a destra.</li></ol>' +
+        (iosAltro ? '<p style="font-size:.85rem;color:#52606d">Se non trovi la voce, apri questa pagina in <b>Safari</b> e ripeti.</p>' : '');
+    }
+    if (android) {
+      if (webview) return '<p>Questa pagina è aperta dentro un’altra app: aprila in Chrome per installarla.</p><a class="api-btn api-prim" href="' + intent() + '">Apri in Chrome</a>';
+      if (evento) h += '<p>Un tocco e trovi l’icona dell’agenda sulla schermata Home, come le altre app.</p><button type="button" class="api-btn api-prim" data-api-installa="1">📲 Installa ora</button><h3>Se il bottone non fa niente</h3>';
+      return h + '<ol><li>tocca ' + ico(SVG_MENU) + ' il menù del browser (in alto a destra; in Samsung Internet ≡ in basso);</li>' +
+        '<li>scegli <b>Installa app</b> oppure <b>Aggiungi a schermata Home</b>;</li><li>conferma con <b>Installa</b>.</li></ol>';
+    }
+    if (evento) h += '<button type="button" class="api-btn api-prim" data-api-installa="1">💻 Installa su questo computer</button>';
+    return h + '<p>Sul computer: in Chrome o Edge c’è l’icona <b>Installa</b> a destra nella barra degli indirizzi.</p>' +
+      '<p><b>Per il telefono</b>: apri questa guida dal telefono, oppure mandala su WhatsApp:</p>' +
+      '<button type="button" class="api-btn api-sec" data-api-copia="' + GUIDA + '">Copia il link della guida</button>';
+  }
+
+  function collega(r) {
+    Array.prototype.forEach.call(r.querySelectorAll('[data-api-copia]'), function (b) { b.onclick = function () { copia(b.getAttribute('data-api-copia'), b); }; });
+    Array.prototype.forEach.call(r.querySelectorAll('[data-api-installa]'), function (b) { b.onclick = installaOra; });
+  }
+  function installaOra() {
+    if (!evento) return;
+    var e = evento; evento = null;
+    e.prompt();
+    e.userChoice.then(function (r) { if (r && r.outcome === 'accepted') { chiudi(); nascondiBarra(); } });
+  }
+
+  var velo = null;
+  function chiudi() { if (velo) { velo.remove(); velo = null; } }
+  function apri() {
+    chiudi();
+    velo = document.createElement('div');
+    velo.className = 'api-velo';
+    velo.innerHTML = '<div class="api-fin" role="dialog" aria-modal="true"><h2>' + ICONA + 'L’agenda sulla schermata Home</h2>' +
+      '<div class="api-guida">' + guida() + '</div>' +
+      '<p style="font-size:.85rem;margin-top:12px">Ragazzi sotto i 14 anni (Family Link)? Funziona lo stesso: l’agenda non chiede nessun account. <a href="' + GUIDA + '">Guida completa</a></p>' +
+      (navigator.share ? '<button type="button" class="api-btn api-sec" data-api-condividi="1">Manda la guida a qualcuno (WhatsApp…)</button>' : '') +
+      '<button type="button" class="api-btn api-sec" data-api-chiudi="1">Chiudi</button></div>';
+    velo.addEventListener('click', function (ev) { if (ev.target === velo) chiudi(); });
+    velo.querySelector('[data-api-chiudi]').onclick = chiudi;
+    var c = velo.querySelector('[data-api-condividi]');
+    if (c) c.onclick = function () { navigator.share({ title: document.title, text: 'Come mettere l’agenda sulla schermata Home:', url: GUIDA }).catch(function () {}); };
+    collega(velo);
+    document.body.appendChild(velo);
+  }
+
+  var barra = null;
+  function nascondiBarra() { if (barra) { barra.remove(); barra = null; } }
+  function testoBarra() { if (barra) barra.querySelector('.api-si').textContent = (android && evento) ? 'Installa' : 'Come si fa'; }
+  function mostraBarra() {
+    if (!BARRA || !telefono || installata || barra) return;
+    var no = Number(leggi('ap-installa-no') || 0);
+    if (no && Date.now() - no < 14 * 24 * 3600 * 1000) return;
+    barra = document.createElement('div');
+    barra.className = 'api-barra';
+    barra.innerHTML = ICONA + '<div class="api-t"><b>Metti l’agenda sul telefono</b>Si apre con un tocco, come un’app.</div>' +
+      '<button type="button" class="api-si">Come si fa</button><button type="button" class="api-x" aria-label="Chiudi">✕</button>';
+    barra.querySelector('.api-si').onclick = function () { if (android && evento) installaOra(); else apri(); };
+    barra.querySelector('.api-x').onclick = function () { scrivi('ap-installa-no', String(Date.now())); nascondiBarra(); };
+    document.body.appendChild(barra);
+    testoBarra();
+  }
+
+  window.addEventListener('beforeinstallprompt', function (e) {
+    e.preventDefault();
+    evento = e;
+    testoBarra();
+    Array.prototype.forEach.call(document.querySelectorAll('.api-guida'), function (g) { g.innerHTML = guida(); collega(g); });
+  });
+  window.addEventListener('appinstalled', function () { installata = true; nascondiBarra(); });
+  window.apInstalla = { apri: apri, guida: guida, collega: collega, stato: function () { return { ios: ios, android: android, installata: installata }; } };
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(function () {});
+  function avvia() { setTimeout(mostraBarra, 2500); }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', avvia); else avvia();
+})();
 </script>
 
 </body>
