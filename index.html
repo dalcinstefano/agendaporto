@@ -8,7 +8,7 @@
 <meta name="robots" content="noindex">
 <link rel="manifest" href="manifest.json"><link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="icon-192.png">
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Portomansuè">
-<script>var STATICO = true, VERSIONE_PAGINA = "16/10/2026 15:43";</script>
+<script>var STATICO = true, VERSIONE_PAGINA = "16/10/2026 15:53";</script>
 </head>
 <body>
 
@@ -715,7 +715,8 @@
   }
 
   var barra = null;
-  function nascondiBarra() { if (barra) { barra.remove(); barra = null; } }
+  
+  function nascondiBarra() { if (barra) { barra.remove(); barra = null; document.body.style.paddingBottom = ''; } }
   function testoBarra() { if (barra) barra.querySelector('.api-si').textContent = (android && evento) ? 'Installa' : 'Come si fa'; }
   function mostraBarra() {
     if (!BARRA || !telefono || installata || barra) return;
@@ -728,6 +729,7 @@
     barra.querySelector('.api-si').onclick = function () { if (android && evento) installaOra(); else apri(); };
     barra.querySelector('.api-x').onclick = function () { scrivi('ap-installa-no', String(Date.now())); nascondiBarra(); };
     document.body.appendChild(barra);
+    document.body.style.paddingBottom = (barra.offsetHeight + 16) + 'px';
     testoBarra();
   }
 
